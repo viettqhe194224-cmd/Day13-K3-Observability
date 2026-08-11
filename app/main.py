@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from structlog.contextvars import bind_contextvars
 
 from .agent import LabAgent
+from .dashboard import aggregate_dashboard, load_recent_records, render_dashboard_html
 from .incidents import disable, enable, status
 from .logging_config import configure_logging, get_logger
 from .metrics import record_error, snapshot
@@ -40,6 +42,13 @@ async def health() -> dict:
 @app.get("/metrics")
 async def metrics() -> dict:
     return snapshot()
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard() -> HTMLResponse:
+    log_path = os.getenv("LOG_PATH", "data/logs.jsonl")
+    records = load_recent_records(Path(log_path), minutes=60)
+    return HTMLResponse(render_dashboard_html(aggregate_dashboard(records)))
 
 
 @app.post("/chat", response_model=ChatResponse)

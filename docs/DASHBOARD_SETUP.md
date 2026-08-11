@@ -31,6 +31,16 @@ python scripts/validate_dashboard.py
 
 Validator kiểm tra cấu trúc contract; nó không thể chứng minh biểu đồ trong ảnh dùng đúng dữ liệu. Evidence runtime vẫn bắt buộc.
 
+## Dashboard runtime của repository
+
+Repository cung cấp dashboard tương đương tại:
+
+```text
+http://127.0.0.1:8000/dashboard
+```
+
+Khởi động API bằng `uvicorn app.main:app --reload --env-file .env`, chạy load test rồi mở URL trên. Dashboard đọc trực tiếp `data/logs.jsonl`, chỉ lấy 60 phút gần nhất, tự refresh sau 30 giây và hiển thị đúng sáu panel cùng threshold trong `config/dashboard.yaml`.
+
 ## Cách kiểm tra runtime
 
 1. Lưu ảnh baseline và giá trị P95/error/cost hiện tại.
